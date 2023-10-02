@@ -64,10 +64,10 @@ server <- function(input, output) {
     df <- data.frame(select)
     # Ajout d'un nouveau champs "time" comprenant la variable "ISO_TIME" en format temps
     df$time <- as.POSIXct(df$ISO_TIME)
-    
+
     # Condition :
-    # Si l'input$radio_button est égale à "wind_kmh" alors les variables 
-    # yl = "Wind Speed (km/h)" et colo = red 
+    # Si l'input$radio_button est égale à "wind_kmh" alors les variables
+    # yl = "Wind Speed (km/h)" et colo = red
     if (input$radio_button== "wind_kmh"){
       yl <- "Wind Speed (km/h)"
       colo <- "red"
@@ -78,7 +78,7 @@ server <- function(input, output) {
       yl <- "Pressure (hPa)"
       colo <- "blue"
     }
-    
+
     # Configuration d'un graphique intéractif via le package plotly
     plot_ly()%>% add_trace(data = df ,
                            x = df$time,
@@ -91,16 +91,16 @@ server <- function(input, output) {
              yaxis = list(title=list(text=paste0("<b>",yl,"</b>"), font=list(size=20))),
              showlegend = FALSE)
   })
-  
-  
+
+
   # Sortie tableau
   output$dt_table <- renderDataTable({
-    
-    # Traitements identiques 
+
+    # Traitements identiques
     select <- mada_cycl_p[mada_cycl_p$NAME == input$picker_cyclone,]
     df <- data.frame(select)
     df$time <- as.POSIXct(df$ISO_TIME)
-    
+
     # Création d'une table de sortie
     datatable(df[,c('ISO_TIME','USA_PRES',"wind_kmh")],
               colnames = c('Time' = 1, 'Pressure (hPa)' = 2,"Wind (km/h)"=3),
@@ -110,16 +110,16 @@ server <- function(input, output) {
                 dom = 'Bfrtip',
                 buttons = c('copy', 'csv', 'excel', 'pdf', 'print')))
     })
-  
-  
-  
-  
+
+
+
+
   # Sortie Carte
   output$map <- renderLeaflet({
-    
+
     # Ici, nous séléctionnons les points du cyclone séléctionné par l'utilisateur
     select <- mada_cycl_p[mada_cycl_p$NAME == input$picker_cyclone,]
-    
+
     # Ajout des points de mesure du cyclone
     leaflet(options = leafletOptions(wheelPxPerZoomLevel=150, zoomSnap= 0.05) )%>%
             addMarkers(data=select, group = "Trajectoire cyclone",layerId = paste(substr(select$ISO_TIME, 1,10),substr(select$ISO_TIME, 12,19)),
